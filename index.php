@@ -938,9 +938,9 @@
     class QRimage {
     
         //----------------------------------------------------------------------
-        public static function png($frame, $filename = false, $pixelPerPoint = 4, $outerFrame = 4,$saveandprint=FALSE) 
+        public static function png($frame, $filename = false, $pixelPerPoint = 4, $outerFrame = 4,$saveandprint=FALSE, $size=100) 
         {
-            $image = self::image($frame, $pixelPerPoint, $outerFrame);
+            $image = self::image($frame, $pixelPerPoint, $outerFrame, $size);
             
             if ($filename === false) {
                 Header("Content-type: image/png");
@@ -974,7 +974,7 @@
         }
     
         //----------------------------------------------------------------------
-        private static function image($frame, $pixelPerPoint = 4, $outerFrame = 4) 
+        private static function image($frame, $pixelPerPoint = 4, $outerFrame = 4, $size=100) 
         {
             $h = count($frame);
             $w = strlen($frame[0]);
@@ -999,7 +999,6 @@
 
             $target_image =ImageCreate( $imgW * $pixelPerPoint, $imgH * $pixelPerPoint);
             ImageCopyResized($target_image, $base_image, 0, 0, 0, 0, $imgW * $pixelPerPoint, $imgH * $pixelPerPoint, $imgW, $imgH);
-            $size = $_GET["size"];
             if($size){
                 $target_image =ImageCreate( $size, $size);
                 ImageCopyResized($target_image, $base_image, 0, 0, 0, 0, $size, $size, $imgW, $imgH);
@@ -3305,7 +3304,7 @@
                 
                 $maxSize = (int)(QR_PNG_MAXIMUM_SIZE / (count($tab)+2*$this->margin));
                 
-                QRimage::png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin,$saveandprint);
+                QRimage::png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin,$saveandprint, $this->size);
             
             } catch (Exception $e) {
             
@@ -3316,9 +3315,10 @@
     }
 
 
-    $text = $_GET['text'];
+    $text = isset($_GET['text']) ? $_GET['text'] : 'https://yantuz.cn';
+	$size = isset($_GET['size']) ? intval($_GET['size']) : 100;
     if($text){
-        QRcode::png($_GET['text'],false,QR_ECLEVEL_L,10,1);
+        QRcode::png($text,false,QR_ECLEVEL_L,$size,1);
     }else{
         echo '<h1>QrCode岩兔站二维码API</h1>';
         echo '<hr/>';
